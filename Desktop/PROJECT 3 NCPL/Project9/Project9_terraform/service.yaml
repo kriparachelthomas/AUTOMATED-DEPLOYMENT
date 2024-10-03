@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-app-service
+spec:
+  selector:
+    app: flask-app
+  ports:
+    - protocol: TCP
+      port: 80        # The port on which the service will be exposed
+      targetPort: 80   # The port on which your Flask container is running
+  type: LoadBalancer   # This will expose the service externally if supported by your cloud provider
