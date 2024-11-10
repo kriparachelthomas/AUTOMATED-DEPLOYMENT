@@ -1,0 +1,61 @@
+# user-service Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+      - name: user-service
+        image: registrymicro.azurecr.io/user-service:latest  # Replace with your image name
+        ports:
+        - containerPort: 5001
+        env:
+        - name: FLASK_ENV
+          value: "development"
+        - name: FLASK_APP
+          value: "app.py"
+        - name: FLASK_RUN_HOST
+          value: "0.0.0.0"
+        - name: FLASK_RUN_PORT
+          value: "5001"
+
+---
+
+# user-service Internal Service (ClusterIP)
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+spec:
+  selector:
+    app: user-service
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 5001
+  type: ClusterIP
+
+---
+
+# user-service External Service (LoadBalancer)
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service-external
+spec:
+  selector:
+    app: user-service
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 5001
+  type: LoadBalancer
